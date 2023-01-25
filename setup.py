@@ -41,14 +41,15 @@ setup(
     cmdclass=versioneer.get_cmdclass(),
     description="BNL/ATF socket-based data acquisition client",
     long_description=readme,
+    long_description_content_type="text/markdown",
     author="Brookhaven National Laboratory",
     author_email="mrakitin@bnl.gov",
     url="https://github.com/BNL-ATF/atfdb",
     python_requires=">={}".format(".".join(str(n) for n in min_version)),
-    packages=find_packages(exclude=["docs", "tests"]),
+    packages=find_packages(exclude=["docs"]),
     entry_points={
         "console_scripts": [
-            # 'command = some.module:some_function',
+            "test-socket-server = atfdb.atfdb.tests.socket_server:server_program",
         ],
     },
     include_package_data=True,
