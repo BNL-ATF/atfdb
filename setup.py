@@ -49,7 +49,7 @@ setup(
     packages=find_packages(exclude=["docs"]),
     entry_points={
         "console_scripts": [
-            "test-socket-server = atfdb.atfdb.tests.socket_server:server_program",
+            "test-socket-server = atfdb.tests.socket_server:server_program",
         ],
     },
     include_package_data=True,

@@ -27,6 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          set -vxeuo pipefail
           # These packages are installed in the base environment but may be older
           # versions. Explicitly upgrade them because they often create
           # installation problems if out of date.
@@ -36,6 +37,12 @@ jobs:
           pip install -r requirements-dev.txt
           pip list
 
+      - name: Start test socket server
+        run: |
+          set -vxeuo pipefail
+          nohup test-socket-server > /tmp/socket.log 2>&1 &
+
       - name: Test with pytest
         run: |
+          set -vxeuo pipefail
           pytest -s -vv
