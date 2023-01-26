@@ -33,7 +33,9 @@ jobs:
           # installation problems if out of date.
           python -m pip install --upgrade pip setuptools numpy
 
-          pip install .
+          python setup.py sdist
+          pip install dist/*.tar.gz
+          python -c "import atfdb; print(f'{atfdb.__version__ = }')"
           pip install -r requirements-dev.txt
           pip list
 
@@ -46,3 +48,8 @@ jobs:
         run: |
           set -vxeuo pipefail
           pytest -s -vv
+
+      - name: Check socket server logs
+        run: |
+          set -vxeuo pipefail
+          cat /tmp/socket.log
