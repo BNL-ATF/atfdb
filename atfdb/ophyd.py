@@ -21,6 +21,10 @@ def open_close_conn(socket_server=None, socket_port=None):
     return inner_decorator
 
 
+class TimeoutException(Exception):
+    ...
+
+
 class ATFSignalNoConn(Signal):
     def __init__(
         self,
@@ -84,6 +88,10 @@ class ATFSignalNoConn(Signal):
             else:
                 # not reached yet, wait a bit
                 ttime.sleep(0.1)
+        raise TimeoutException(
+            f"""{self.name} has not reached {self._setpoint} within timeout of
+            {self._timeout} seconds. Current position is {self._get_readback()}."""
+        )
 
     def set(self, *args, **kwargs):
         self.put(*args, **kwargs)
