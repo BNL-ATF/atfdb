@@ -321,6 +321,7 @@ def host_connect(host_name=None, port_number=None):
 
     timestamp()
     print(f"{ATF_DB_SUCCESS}Successful connection to database host.")
+    return atf_db_socket
 
 
 def host_disconnect():

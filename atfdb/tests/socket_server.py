@@ -23,11 +23,12 @@ def server_program(seed=0):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # look closely. The bind() function takes tuple as argument
     server_socket.bind((host, port))  # bind host address and port together
+    print_log(f"Started test socket server at {host}:{port}")
 
     # configure how many client the server can listen simultaneously
     server_socket.listen(2)
     conn, address = server_socket.accept()  # accept new connection
-    print_log("Connection from: " + str(address))
+    print_log(f"Connection from: {address}")
     data = "greeting"
     conn.send(data.encode())  # send data to the client
 
@@ -55,6 +56,7 @@ def server_program(seed=0):
             conn.send(reply.encode())  # send data to the client
         else:
             print_log(f"{data = }")
+    print_log("Closing connection...")
     conn.close()  # close the connection
 
 

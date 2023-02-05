@@ -1,3 +1,6 @@
+import subprocess
+import time as ttime
+
 import pytest
 
 from atfdb.atfdb import host_connect, host_disconnect
@@ -20,8 +23,26 @@ SERVER_PORT = 5000
 
 @pytest.fixture(scope="session")
 def socket_server():
+    p = subprocess.Popen(
+        "test-socket-server".split(),
+        start_new_session=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        shell=True,
+    )
+    ttime.sleep(2.0)
+
+    # Connect to the test socket server with the client
     host_connect(SERVER_ADDRESS, SERVER_PORT)
 
     yield
 
+    # Disconnect the client from the test socket server
     host_disconnect()
+
+    # Print logs
+    # print(f"{logfile[-1] = }")
+    std_out, std_err = p.communicate()
+    std_out = std_out.decode()
+    print(std_out)
+    p.terminate()
