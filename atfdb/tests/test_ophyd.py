@@ -13,7 +13,7 @@ def test_ophyd_atfsignal_never_sets(socket_server):
     with pytest.raises(TimeoutException) as excinfo:
         test1.put(1)
 
-    excinfo_value = str(excinfo.value)
+    excinfo_value = excinfo.exconly()
     assert "ophyd object has not reached the setpoint" in excinfo_value, excinfo_value
     print(excinfo_value)
 
