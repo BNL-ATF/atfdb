@@ -3,7 +3,8 @@ import time as ttime
 from ophyd import Signal
 from ophyd.sim import NullStatus
 
-from atfdb import atfdb
+from . import atfdb
+from .utils import logger
 
 
 def open_close_conn(socket_server=None, socket_port=None):
@@ -19,6 +20,10 @@ def open_close_conn(socket_server=None, socket_port=None):
         return wrapped
 
     return inner_decorator
+
+
+class TimeoutException(Exception):
+    ...
 
 
 class ATFSignalNoConn(Signal):
@@ -78,12 +83,25 @@ class ATFSignalNoConn(Signal):
             atfdb.get_channel_index(f"{self._db}::{self._psname};{self._write_suffix}"),
             value,
         )
-        while ttime.monotonic() - start_time < self._timeout:
-            if abs(self._get_readback() - value) < self._tol:
-                break
+        while True:
+            waited_time = ttime.monotonic() - start_time
+            how_far = self._get_readback() - value
+            logger.debug(f"{waited_time = :.3f}s  {how_far = :.6f}")
+            if waited_time < self._timeout:
+                if abs(how_far) < self._tol:
+                    break
+                else:
+                    # not reached yet, wait a bit
+                    ttime.sleep(0.1)
             else:
-                # not reached yet, wait a bit
-                ttime.sleep(0.1)
+                raise TimeoutException(
+                    f"'{self.name}' ophyd object has not reached the setpoint={self._setpoint} "
+                    f"within the timeout of {self._timeout} seconds (waited {waited_time:.3f}s).\n"
+                    f"Current position: {self._get_readback():.6f}\n\n"
+                    f"Details:\n  db='{self._db}'\n  psname='{self._psname}'\n"
+                    f"  read_suffix='{self._read_suffix}'\n  write_suffix='{self._write_suffix}'\n"
+                    f"  tolerance={self._tol}"
+                )
 
     def set(self, *args, **kwargs):
         self.put(*args, **kwargs)
